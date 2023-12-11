@@ -1,1 +1,2 @@
-# Basic weather app
+# Basic budget app
+Some features : 
