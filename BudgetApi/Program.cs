@@ -1,9 +1,14 @@
+using BudgetApi.Data;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
 
@@ -35,7 +40,19 @@ app.MapGet("/weatherforecast", () =>
 })
 .WithName("GetWeatherForecast")
 .WithOpenApi();
-
+app.MapGet("/testdb", async (ApplicationDbContext dbContext) =>
+{
+    try
+    {
+        var users = await dbContext.Users.ToListAsync();
+        return Results.Ok(users);
+    }
+    catch (Exception ex)
+    {
+        // Log the exception details
+        return Results.Problem(ex.Message);
+    }
+});
 app.Run();
 
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
