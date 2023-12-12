@@ -11,12 +11,12 @@ namespace BudgetApi.Models
     public decimal Amount { get; set; }
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
-    public string Description { get; set; }
+    public required string Description { get; set; }
 
     // Foreign Key
     public int UserId { get; set; }
 
     // Navigation property
-    public virtual User User { get; set; }
+    public virtual required User User { get; set; }
     }
 }
