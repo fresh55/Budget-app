@@ -23,6 +23,20 @@ namespace BudgetApi.Services
             return await _context.Users.ToListAsync();
         }
 
+        public async Task<User> CreateUserWithDetailsAsync(string username, string email)
+        {
+            var newUser = new User
+            {
+                Username = username,
+                Email = email,
+                Transactions = new List<Transaction>(), // Empty list
+                Budgets = new List<Budget>() // Empty list
+            };
+
+            _context.Users.Add(newUser);
+            await _context.SaveChangesAsync();
+            return newUser;
+        }
         public async Task<User> GetUserByIdAsync(int id)
         {
             return await _context.Users.FindAsync(id);

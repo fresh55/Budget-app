@@ -124,10 +124,6 @@ namespace BudgetApi.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PasswordHash")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -135,6 +131,20 @@ namespace BudgetApi.Migrations
                     b.HasKey("UserId");
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = 1,
+                            Email = "user1@example.com",
+                            Username = "HardcodedUser1"
+                        },
+                        new
+                        {
+                            UserId = 2,
+                            Email = "user2@example.com",
+                            Username = "HardcodedUser2"
+                        });
                 });
 
             modelBuilder.Entity("BudgetApi.Models.Budget", b =>

@@ -32,6 +32,11 @@ namespace BudgetApi.Data
                 .Property(t => t.Amount)
                 .HasPrecision(18, 4); // Adjust the precision and scale as needed
 
+              modelBuilder.Entity<User>().HasData(
+           new User { UserId = 1, Username = "HardcodedUser1", Email = "user1@example.com" },
+        new User { UserId = 2, Username = "HardcodedUser2", Email = "user2@example.com" }
+    );
+
         }
     }
 }

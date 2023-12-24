@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using BudgetApi.Data;
+using BudgetApi.Interfaces;
 using BudgetApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,97 +12,80 @@ using Microsoft.Extensions.Logging;
 
 namespace BudgetApi.Controllers
 {
-    [ApiController]
-    [Route("[controller]")]
-    public class UsersController : ControllerBase
+[ApiController]
+[Route("[controller]")]
+public class UsersController : ControllerBase
 {
-    private readonly ApplicationDbContext _context;
+     private readonly IUserService _userService;
+     private readonly ILogger<UsersController> _logger;
 
-    public UsersController(ApplicationDbContext context)
-    {
-        _context = context;
-    }
+   public UsersController(IUserService userService, ILogger<UsersController> logger)
+{
+    _userService = userService;
+    _logger = logger;
+}
 
     // GET: api/Users
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<User>>> GetUsers()
-    {
-        return await _context.Users.ToListAsync();
-    }
+     [HttpGet]
+        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        {   _logger.LogInformation($"Creating user");
+            return Ok(await _userService.GetAllUsersAsync());
+        }
 
     // GET: api/Users/5
     [HttpGet("{id}")]
-    public async Task<ActionResult<User>> GetUser(int id)
-    {
-        var user = await _context.Users.FindAsync(id);
-
-        if (user == null)
+        public async Task<ActionResult<User>> GetUser(int id)
         {
-            return NotFound();
+            var user = await _userService.GetUserByIdAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            return user;
         }
-
-        return user;
-    }
 
     // POST: api/Users
     [HttpPost]
     public async Task<ActionResult<User>> PostUser(User user)
-    {
-        _context.Users.Add(user);
-        await _context.SaveChangesAsync();
-
-        return CreatedAtAction("GetUser", new { id = user.UserId }, user);
-    }
+        {
+            var createdUser = await _userService.CreateUserAsync(user);
+            return CreatedAtAction(nameof(GetUser), new { id = createdUser.UserId }, createdUser);
+        }
 
     // PUT: api/Users/5
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutUser(int id, User user)
-    {
-        if (id != user.UserId)
+       public async Task<IActionResult> PutUser(int id, User user)
         {
-            return BadRequest();
-        }
-
-        _context.Entry(user).State = EntityState.Modified;
-
-        try
-        {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!UserExists(id))
+            if (id != user.UserId)
             {
-                return NotFound();
+                return BadRequest();
             }
-            else
-            {
-                throw;
-            }
-        }
 
-        return NoContent();
-    }
+            await _userService.UpdateUserAsync(user);
+            return NoContent();
+        }
 
     // DELETE: api/Users/5
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteUser(int id)
-    {
-        var user = await _context.Users.FindAsync(id);
-        if (user == null)
+     public async Task<IActionResult> DeleteUser(int id)
         {
-            return NotFound();
+            await _userService.DeleteUserAsync(id);
+            return NoContent();
         }
 
-        _context.Users.Remove(user);
-        await _context.SaveChangesAsync();
+ public class UserCreationRequest
+{
+    public string Username { get; set; }
+    public string Email { get; set; }
+}
 
-        return NoContent();
-    }
+[HttpPost("createWithDetails")]
+public async Task<ActionResult<User>> CreateUserWithDetails([FromBody] UserCreationRequest request)
+{
+    _logger.LogInformation($"Creating user with username: {request.Username} and email: {request.Email}");
+    var user = await _userService.CreateUserWithDetailsAsync(request.Username, request.Email);
+    return CreatedAtAction(nameof(GetUser), new { id = user.UserId }, user);
+}
 
-    private bool UserExists(int id)
-    {
-        return _context.Users.Any(e => e.UserId == id);
-    }
 }
 }
