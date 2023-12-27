@@ -2,6 +2,8 @@ using BudgetApi.Data;
 using BudgetApi.Interfaces;
 using BudgetApi.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +23,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<IUserService, UserService>();
 var app = builder.Build();
 
+
+// Configure Identity
+// Configure ASP.NET Core Identity
+builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddEntityFrameworkStores<ApplicationDbContext>();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -31,6 +38,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseHttpsRedirection();
 app.UseRouting();
-
+// Map Identity API Endpoints
+app.MapIdentityApi<IdentityUser>();
 app.MapControllers();
 app.Run();
