@@ -1,0 +1,29 @@
+.header {
+  display: flex;
+  height: 80px;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background-color: white;
+}
+
+.navbar .nav-links {
+  display: flex;
+  list-style-type: none;
+}
+
+.navbar .nav-links li a {
+  text-decoration: none;
+  margin: 0 15px; /* Slightly increased margin */
+  padding: 10px 15px; /* Increased padding for larger click area */
+  color: #333;
+  font-family: 'Arial', sans-serif; /* Modern, readable font */
+  font-size: 18px; /* Larger font size for readability */
+  transition: color 0.3s ease;
+}
+
+.navbar .nav-links li a:hover,
+.navbar .nav-links li a.routerLinkActive {
+  color: #007bff;
+}
